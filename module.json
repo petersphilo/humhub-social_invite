@@ -1,0 +1,19 @@
+{
+	"id": "social_invite",
+	"name": "Social Invite",
+	"homepage": "https://github.com/petersphilo/humhub-social_invite",
+	"authors": [{
+		"name": "Peter Zieseniss",
+		"homepage": "zconsulting.net",
+		"role": "The Alpha, The Omega - just kidding; it's just me.."
+		}],
+	"description": "This module creates an Invite-by-email widget that is visible only by the members of a chosen group",
+	"keywords": [
+		"users", "invite"
+		],
+	"version": "1.0.0",
+	"humhub": {
+		"minVersion": "1.12.0"
+		},
+	"screenshots": ["assets/screen-1.jpg","assets/screen-2.jpg"]
+}
