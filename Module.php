@@ -44,7 +44,7 @@ class Module extends \humhub\components\Module
 		parent::enable();
 
 		if (Setting::Get('theGroup', 'social_invite') == '') {
-			Setting::Set('theGroup', 1, 'social_invite'); 
+			Setting::Set('theGroup', 0, 'social_invite'); 
 			}
 		if (Setting::Get('theSpace', 'social_invite') == '') {
 			Setting::Set('theSpace', 1, 'social_invite'); 
@@ -53,7 +53,7 @@ class Module extends \humhub\components\Module
 			Setting::Set('ResponsiveTop', 0, 'social_invite'); 
 			}
 		if (Setting::Get('SISortOrder', 'social_invite') == '') {
-			Setting::Set('SISortOrder', 20, 'social_invite'); 
+			Setting::Set('SISortOrder', 160, 'social_invite'); 
 			}
 		}
 	

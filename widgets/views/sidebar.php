@@ -6,11 +6,11 @@ use yii\helpers\Html;
 use humhub\models\Setting;
 use humhub\modules\user\models\User;
 use Yii;
+//use yii\helpers\Json;
 
-$theGroupEcho = Setting::Get('theGroup', 'social_invite');
+//$theGroupEcho = Json::decode(Setting::Get('theGroup', 'social_invite'));
 $theSpaceEcho = Setting::Get('theSpace', 'social_invite');
 $ResponsiveTopEcho = Setting::Get('ResponsiveTop', 'social_invite');
-//$SISortOrderEcho = Setting::Get('SISortOrder', 'social_invite');
 
 ?>
 <div class="panel panel-default" id="social_invite-panel">
@@ -54,7 +54,7 @@ $ResponsiveTopEcho = Setting::Get('ResponsiveTop', 'social_invite');
 						e.preventDefault(); 
 						
 						var guestEmailEL=$('#inviteForm-theEmail'), 
-							MyFromGroup=$('.form-group'), 
+							MyFromGroup=$('#social_invite-inviteForm .form-group'), 
 							guestEmail=guestEmailEL.val(), 
 							theSpaceEcho=<?php echo $theSpaceEcho; ?>, 
 							theErrorText="<?php echo Yii::t('SocialInviteModule.base','Please provide a valid email address'); ?>", 
@@ -78,40 +78,6 @@ $ResponsiveTopEcho = Setting::Get('ResponsiveTop', 'social_invite');
 					}); 
 			</script>
 		</form>
-		<?php
-			// Button Get a Response
-			// echo Html::a('Get the Response', ['/social_invite/response/response?ThisIsAtest=Yes'], array('class' => 'btn btn-info btn-sm','data-target' => '#globalModal'));
-		?>
-		<div style='color: #999; background-color: #eee; display: none; '>
-		<hr>
-			<?php
-				
-				echo 'The Authorized GroupID '.$theGroupEcho.'<br>'; 
-				
-				echo 'The Destined SpaceID '.$theSpaceEcho.'<br>'; 
-				
-				$userID = Yii::$app->user->id;
-				
-				$userGroupArr=[]; 
-				$eachUserGroup=''; 
-				$eachUserGroups_cmd=Yii::$app->db->createCommand("SELECT group_id FROM group_user WHERE (group_user.user_id=$userID);")->queryAll(); 
-				foreach($eachUserGroups_cmd as $eachUserGroups_row){
-					$eachUserGroup.=' '.$eachUserGroups_row['group_id'];
-					array_push($userGroupArr,$eachUserGroups_row['group_id']); 
-					}
-				echo 'Your GroupIDs '.$eachUserGroup.'<br>'; 
-				
-				if(in_array($theGroupEcho,$userGroupArr)){
-					echo 'You are authorized to proceed'.'<br>'; 
-					}
-				else{
-					echo 'You are not allowed here!'.'<br>'; 
-					}
-				
-				echo 'Your UserID '.$userID; 
-				
-			?>
-		</div>
 		<?php
 			if($ResponsiveTopEcho==1){
 		?>

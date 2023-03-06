@@ -7,6 +7,7 @@ use yii\console\Controller;
 use yii\web\Request;
 use humhub\modules\social_invite\models\ConfigureForm;
 use humhub\models\Setting;
+use yii\helpers\Json;
 
 /**
  * Defines the configure actions.
@@ -32,12 +33,12 @@ class ConfigController extends \humhub\modules\admin\components\Controller {
 		if(Yii::$app->request->get('SocInviteDL')){$this->MyDataRequest(); }
 		else{
 			$form = new ConfigureForm();
-			$form->theGroup = Setting::Get('theGroup', 'social_invite');
+			$form->theGroup = Json::decode(Setting::Get('theGroup', 'social_invite'));
 			$form->theSpace = Setting::Get('theSpace', 'social_invite');
 			$form->ResponsiveTop = Setting::Get('ResponsiveTop', 'social_invite');
 			$form->SISortOrder = Setting::Get('SISortOrder', 'social_invite');
 			if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-				$form->theGroup = Setting::Set('theGroup', $form->theGroup, 'social_invite');
+				$form->theGroup = Setting::Set('theGroup', Json::encode($form->theGroup), 'social_invite');
 				$form->theSpace = Setting::Set('theSpace', $form->theSpace, 'social_invite');
 				$form->ResponsiveTop = Setting::Set('ResponsiveTop', $form->ResponsiveTop, 'social_invite');
 				$form->SISortOrder = Setting::Set('SISortOrder', $form->SISortOrder, 'social_invite');

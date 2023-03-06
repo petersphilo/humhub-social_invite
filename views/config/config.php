@@ -5,6 +5,7 @@ use Yii;
 use humhub\modules\ui\form\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\Json;
 
 use humhub\models\Setting;
 
@@ -12,16 +13,22 @@ use humhub\models\Setting;
  * @var $model \humhub\modules\social_invite\models\ConfigureForm
  */
 
-$ReadTheGroup=Setting::Get('theGroup', 'social_invite'); 
+$ReadTheGroup=Json::decode(Setting::Get('theGroup', 'social_invite')); 
+if(is_int($ReadTheGroup)){$ReadTheGroup=[$ReadTheGroup];}
 $ReadTheSpace=Setting::Get('theSpace', 'social_invite'); 
-//$ResponsiveTopEcho = Setting::Get('ResponsiveTop', 'social_invite');
-//$SISortOrderEcho = Setting::Get('SISortOrder', 'social_invite');
 
-$GetTheGroupName_cmd=Yii::$app->db->createCommand("SELECT name FROM `group` WHERE id=$ReadTheGroup;")->queryScalar(); 
+$BlankGroupName=Yii::t('SocialInviteModule.base','Empty Group (to select no group)'); 
+
+$ConcernedGroups=''; 
+foreach($ReadTheGroup as $EachGroup){
+	if($EachGroup==0){$ConcernedGroups.=$BlankGroupName."; "; }
+	else{$ConcernedGroups.=Yii::$app->db->createCommand("SELECT name FROM `group` WHERE id=$EachGroup;")->queryScalar()." (id: $EachGroup); "; }
+	}
 $GetTheSpaceName_cmd=Yii::$app->db->createCommand("SELECT name FROM space WHERE id=$ReadTheSpace;")->queryScalar(); 
 
 
 $MyGroupsFull=[]; 
+$MyGroupsFull+=[0=>$BlankGroupName]; 
 $ListAllGroups_cmd=Yii::$app->db->createCommand("SELECT id,name FROM `group`;")->queryAll(); 
 foreach($ListAllGroups_cmd as $ListAllGroups_row){
 	$GroupName=$ListAllGroups_row['id'].' -- '.$ListAllGroups_row['name']; 
@@ -47,8 +54,8 @@ foreach($ListAllSpaces_cmd as $ListAllSpaces_row){
 		</div>
 		<p>
 			<?php 
-				echo "The Current Group ID is: $ReadTheGroup; which is the group <strong>$GetTheGroupName_cmd</strong><br>"; 
-				echo "The Current Space ID is: $ReadTheSpace; which is the group <strong>$GetTheSpaceName_cmd</strong><br>"; 
+				echo Yii::t('SocialInviteModule.base','The Current Selected Groups are').": <strong>$ConcernedGroups</strong><br>"; 
+				echo Yii::t('SocialInviteModule.base','The Current Selected Space is').": <strong>$GetTheSpaceName_cmd</strong><br>"; 
 			?>
 		</p>
 		<br/>
@@ -57,9 +64,7 @@ foreach($ListAllSpaces_cmd as $ListAllSpaces_row){
 
 		<div class="form-group">
 			<?php 
-				/* echo $form->field($model, 'theGroup')->textInput();  */
-				echo $form->field($model, 'theGroup')->dropdownList($MyGroupsFull); 
-				/* echo $form->field($model, 'theSpace')->textInput();  */
+				echo $form->field($model, 'theGroup')->checkboxList($MyGroupsFull);
 				echo $form->field($model, 'theSpace')->dropdownList($MySpacesFull); 
 				echo $form->field($model, 'ResponsiveTop')->dropdownList([0=>'No',1=>'Yes']);  
 				echo $form->field($model, 'SISortOrder')->textInput(); 

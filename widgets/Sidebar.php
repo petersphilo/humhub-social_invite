@@ -8,13 +8,15 @@ use humhub\models\Setting;
 use humhub\modules\user\models\User;
 use Yii;
 use yii\base\Widget;
+use yii\helpers\Json;
 
 class Sidebar extends Widget
 {
 
 	public function run()
 	{
-		$theAuthorizedGroup = Setting::Get('theGroup', 'social_invite');
+		$AuthorizedGroupArr = Json::decode(Setting::Get('theGroup', 'social_invite'));
+		if(is_int($AuthorizedGroupArr)){$AuthorizedGroupArr=[$AuthorizedGroupArr];}
 		$userID = Yii::$app->user->id;
 		
 		$userGroupArr=[]; 
@@ -23,8 +25,7 @@ class Sidebar extends Widget
 			array_push($userGroupArr,$eachUserGroups_row['group_id']); 
 			}
 		
-		if(in_array($theAuthorizedGroup,$userGroupArr)){
-		/* if($theAuthorizedGroup==3){ */
+		if(count(array_intersect($AuthorizedGroupArr,$userGroupArr))>0){
 			return $this->render('sidebar');
 			}
 		else{

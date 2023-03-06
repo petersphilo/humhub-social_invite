@@ -32,7 +32,7 @@ cd protected/modules
 git clone https://github.com/petersphilo/humhub-social_invite.git social_invite
 ```
 
-- Go to Admin > Modules. You should now see the `Social Stats` module in your list of installed modules
+- Go to Admin > Modules. You should now see the `Social Invite` module in your list of installed modules
 
 - Click "Enable". This will install the module for you
 
@@ -44,7 +44,7 @@ Eventually, i hope to have this module in the 'store'
 
 - Upload it to the `protected/modules` directory of your HumHub installation and expand it (then delete the zip file)
 
-- Go to Admin > Modules. You should now see the `Social Stats` module in your list of installed modules
+- Go to Admin > Modules. You should now see the `Social Invite` module in your list of installed modules
 
 - Click "Enable". This will install the module for you
 

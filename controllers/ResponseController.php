@@ -97,14 +97,14 @@ class ResponseController extends \humhub\components\Controller
 			$userInvite->source = 'invite';
 			$userInvite->user_originator_id = $userID;
 			$userInvite->space_invite_id = $TheGuestSpaceID; // the space ID
+			$ActivityLog.='No prior Inivtes'.$MyBR; 
+		} else {
+			$userInvite->user_originator_id = $userID;
+			$userInvite->space_invite_id = $TheGuestSpaceID; 
 			// There is a pending registration
 			// Steal it and send mail again
 			// Unfortunately there are no multiple workspace invites supported
 			// So we take the last one
-			$ActivityLog.='No prior Inivtes'.$MyBR; 
-		} else {
-			$userInvite->user_originator_id = $userID;
-			$userInvite->space_invite_id = 32; 
 			$ActivityLog.='A prior Inivte exists'.$MyBR; 
 			$NativeInviteCount=1; 
 			}
@@ -114,13 +114,15 @@ class ResponseController extends \humhub\components\Controller
 			$userEmail=Yii::$app->db->createCommand("SELECT email FROM user WHERE id=$userID;")->queryScalar(); 
 			if($NativeInviteCount){}; 
 			//social_invite
-			$CheckSocInvitedb_cmd=Yii::$app->db->createCommand("SELECT id as SocInviteID,guest_email,date_updated,originator_ID,times_sent FROM social_invite WHERE guest_email='$TheGuestEmail';")->queryAll(); 
-			$MyRecordsCount=count($CheckSocInvitedb_cmd); 
+			$CheckSocInvitedb_cmd=Yii::$app->db->createCommand("SELECT id as SocInviteID,guest_email,date_updated,originator_ID,times_sent FROM social_invite WHERE guest_email=:Email;"); 
+			$CheckSocInvitedb=$CheckSocInvitedb_cmd->bindValue(':Email',$TheGuestEmail)->queryAll(); 
+			$MyRecordsCount=count($CheckSocInvitedb); 
 			
 			if($NativeInviteCount==0){
 				if($MyRecordsCount==0){
 					$ActivityLog.='No records of this yet in social_invite'.$MyBR; 
-					Yii::$app->db->createCommand("INSERT INTO social_invite (guest_email,originator_ID,originator_email,times_sent) VALUES ('$TheGuestEmail','$userID','$userEmail',1);")->query(); 
+					$FreshNewInvite=Yii::$app->db->createCommand("INSERT INTO social_invite (guest_email,originator_ID,originator_email,times_sent) VALUES (:Email,'$userID','$userEmail',1);"); 
+					$FreshNewInvite->bindValue(':Email',$TheGuestEmail)->query(); 
 					}
 				elseif($MyRecordsCount==1){
 					$ActivityLog.='Nothing in social_invite, but there was a native Invite'.$MyBR; // incomplete!
@@ -132,20 +134,35 @@ class ResponseController extends \humhub\components\Controller
 				$ResponseTitle=Yii::t('SocialInviteModule.base','Invitation Sent'); 
 				}
 			elseif($NativeInviteCount>0){
-				$date_updated=$CheckSocInvitedb_cmd[0]['date_updated']; 
+				$SendInviteException=0; 
+				if($MyRecordsCount==0){
+					$ActivityLog.='No records of this yet in social_invite'.$MyBR; 
+					$OtherNewInvite=Yii::$app->db->createCommand("INSERT INTO social_invite (guest_email,originator_ID,originator_email,times_sent) VALUES (:Email,'$userID','$userEmail',1);"); 
+					$OtherNewInviteGo=$OtherNewInvite->bindValue(':Email',$TheGuestEmail)->query(); 
+					$OtherNewInviteID=Yii::$app->db->getLastInsertID();
+					
+					$OtherNewInviteSel=Yii::$app->db->createCommand("SELECT id as SocInviteID,guest_email,date_updated,originator_ID,times_sent FROM social_invite WHERE id=$OtherNewInviteID;")->queryAll(); 
+					$date_updated=$OtherNewInviteSel[0]['date_updated']; 
+					$SocInviteID=$OtherNewInviteSel[0]['SocInviteID']; 
+					$NumOfTimesSent=0; 
+					$SendInviteException=1; 
+					}
+				else{
+					$date_updated=$CheckSocInvitedb[0]['date_updated']; 
+					$SocInviteID=$CheckSocInvitedb[0]['SocInviteID']; 
+					$NumOfTimesSent=$CheckSocInvitedb[0]['times_sent']; 
+					}
 				$timeSinceDateUpdated=round((time()-strtotime($date_updated))/3600,1); 
 				//$ResponseMessage.='This email address has already received an invitation on: '.$date_updated.'; which is '.$timeSinceDateUpdated.' hours ago'.$MyBR;
 				$ResponseMessage.=Yii::t('SocialInviteModule.base','This email address <u>has already received an invitation</u> on: ').$date_updated.Yii::t('SocialInviteModule.base','; which is ').$timeSinceDateUpdated.Yii::t('SocialInviteModule.base',' hours ago').$MyBR; 
 				$ActivityLog.='1 record in social_invite'.$MyBR;
 				//86400=1day; 172800=2days; 
-				if($timeSinceDateUpdated<48){
+				if(($timeSinceDateUpdated<48)&&($SendInviteException==0)){
 					//$ResponseMessage.='<br><b><u>no email was sent</u></b><br>Please wait at least 48 hours before you send another invitation to this email addtress..'.$MyBR;
 					$ResponseMessage.=Yii::t('SocialInviteModule.base','<br><b><u>no email was sent</u></b><br>Please wait at least 48 hours before you send another invitation to this email addtress..').$MyBR;
 					$ResponseTitle=Yii::t('SocialInviteModule.base','No Invitation Sent'); 
 					}
 				else{
-					$SocInviteID=$CheckSocInvitedb_cmd[0]['SocInviteID']; 
-					$NumOfTimesSent=$CheckSocInvitedb_cmd[0]['times_sent']; 
 					if($NumOfTimesSent==''){$NumOfTimesSent=1; }
 					if($NumOfTimesSent<10){
 						$NewTimesSent=$NumOfTimesSent+1; 
