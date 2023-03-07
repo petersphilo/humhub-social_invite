@@ -15,7 +15,9 @@ class Sidebar extends Widget
 
 	public function run()
 	{
-		$AuthorizedGroupArr = Json::decode(Setting::Get('theGroup', 'social_invite'));
+		$social_invite=Yii::$app->getModule('social_invite'); 
+		
+		$AuthorizedGroupArr = Json::decode($social_invite->settings->get('theGroup'));
 		if(is_int($AuthorizedGroupArr)){$AuthorizedGroupArr=[$AuthorizedGroupArr];}
 		$userID = Yii::$app->user->id;
 		

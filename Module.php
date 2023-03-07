@@ -23,9 +23,9 @@ class Module extends \humhub\components\Module
 		if (Yii::$app->hasModule('social_invite')) {
 			
 			$SISortOrderSet=800; 
-			/**/
-			if (Setting::Get('SISortOrder', 'social_invite') >= 0) {
-				$SISortOrderSet = Setting::Get('SISortOrder', 'social_invite'); 
+			$social_invite=Yii::$app->getModule('social_invite'); 
+			if ($social_invite->settings->get('SISortOrder') >= 0) {
+				$SISortOrderSet = $social_invite->settings->get('SISortOrder'); 
 				}
 			
 			$event->sender->addWidget(widgets\Sidebar::className(), array(), array('sortOrder' => intval($SISortOrderSet)));
@@ -41,19 +41,21 @@ class Module extends \humhub\components\Module
 	 */
 	public function enable()
 	{
+		$social_invite=Yii::$app->getModule('social_invite'); 
+		
 		parent::enable();
 
-		if (Setting::Get('theGroup', 'social_invite') == '') {
-			Setting::Set('theGroup', 0, 'social_invite'); 
+		if ($social_invite->settings->get('theGroup') == '') {
+			$social_invite->settings->set('theGroup', 0); 
 			}
-		if (Setting::Get('theSpace', 'social_invite') == '') {
-			Setting::Set('theSpace', 1, 'social_invite'); 
+		if ($social_invite->settings->get('theSpace') == '') {
+			$social_invite->settings->set('theSpace', 1); 
 			}
-		if (Setting::Get('ResponsiveTop', 'social_invite') == '') {
-			Setting::Set('ResponsiveTop', 0, 'social_invite'); 
+		if ($social_invite->settings->get('ResponsiveTop') == '') {
+			$social_invite->settings->set('ResponsiveTop', 0); 
 			}
-		if (Setting::Get('SISortOrder', 'social_invite') == '') {
-			Setting::Set('SISortOrder', 160, 'social_invite'); 
+		if ($social_invite->settings->get('SISortOrder') == '') {
+			$social_invite->settings->set('SISortOrder', 160); 
 			}
 		}
 	

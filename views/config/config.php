@@ -13,9 +13,11 @@ use humhub\models\Setting;
  * @var $model \humhub\modules\social_invite\models\ConfigureForm
  */
 
-$ReadTheGroup=Json::decode(Setting::Get('theGroup', 'social_invite')); 
+$social_invite=Yii::$app->getModule('social_invite'); 
+
+$ReadTheGroup=Json::decode($social_invite->settings->get('theGroup')); 
 if(is_int($ReadTheGroup)){$ReadTheGroup=[$ReadTheGroup];}
-$ReadTheSpace=Setting::Get('theSpace', 'social_invite'); 
+$ReadTheSpace=$social_invite->settings->get('theSpace'); 
 
 $BlankGroupName=Yii::t('SocialInviteModule.base','Empty Group (to select no group)'); 
 

@@ -1,5 +1,10 @@
 
 
+### 1.1.1
+
+small edit
+
+
 ### 1.1
 
 - added possibility to select multiple groups

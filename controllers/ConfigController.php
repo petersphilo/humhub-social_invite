@@ -32,16 +32,18 @@ class ConfigController extends \humhub\modules\admin\components\Controller {
 	public function actionConfig(){
 		if(Yii::$app->request->get('SocInviteDL')){$this->MyDataRequest(); }
 		else{
+			$social_invite=Yii::$app->getModule('social_invite'); 
+			
 			$form = new ConfigureForm();
-			$form->theGroup = Json::decode(Setting::Get('theGroup', 'social_invite'));
-			$form->theSpace = Setting::Get('theSpace', 'social_invite');
-			$form->ResponsiveTop = Setting::Get('ResponsiveTop', 'social_invite');
-			$form->SISortOrder = Setting::Get('SISortOrder', 'social_invite');
+			$form->theGroup = Json::decode($social_invite->settings->get('theGroup'));
+			$form->theSpace = $social_invite->settings->get('theSpace');
+			$form->ResponsiveTop = $social_invite->settings->get('ResponsiveTop');
+			$form->SISortOrder = $social_invite->settings->get('SISortOrder');
 			if ($form->load(Yii::$app->request->post()) && $form->validate()) {
-				$form->theGroup = Setting::Set('theGroup', Json::encode($form->theGroup), 'social_invite');
-				$form->theSpace = Setting::Set('theSpace', $form->theSpace, 'social_invite');
-				$form->ResponsiveTop = Setting::Set('ResponsiveTop', $form->ResponsiveTop, 'social_invite');
-				$form->SISortOrder = Setting::Set('SISortOrder', $form->SISortOrder, 'social_invite');
+				$form->theGroup = $social_invite->settings->set('theGroup', Json::encode($form->theGroup));
+				$form->theSpace = $social_invite->settings->set('theSpace', $form->theSpace);
+				$form->ResponsiveTop = $social_invite->settings->set('ResponsiveTop', $form->ResponsiveTop);
+				$form->SISortOrder = $social_invite->settings->set('SISortOrder', $form->SISortOrder);
 				return $this->redirect(['/social_invite/config/config']);
 				}
 

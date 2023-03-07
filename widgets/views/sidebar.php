@@ -8,9 +8,10 @@ use humhub\modules\user\models\User;
 use Yii;
 //use yii\helpers\Json;
 
-//$theGroupEcho = Json::decode(Setting::Get('theGroup', 'social_invite'));
-$theSpaceEcho = Setting::Get('theSpace', 'social_invite');
-$ResponsiveTopEcho = Setting::Get('ResponsiveTop', 'social_invite');
+$social_invite=Yii::$app->getModule('social_invite'); 
+
+$theSpaceEcho = $social_invite->settings->get('theSpace');
+$ResponsiveTopEcho = $social_invite->settings->get('ResponsiveTop');
 
 ?>
 <div class="panel panel-default" id="social_invite-panel">
