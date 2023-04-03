@@ -41,9 +41,9 @@ class Module extends \humhub\components\Module
 	 */
 	public function enable()
 	{
-		$social_invite=Yii::$app->getModule('social_invite'); 
-		
 		parent::enable();
+		
+		$social_invite=Yii::$app->getModule('social_invite'); 
 
 		if ($social_invite->settings->get('theGroup') == '') {
 			$social_invite->settings->set('theGroup', 0); 
