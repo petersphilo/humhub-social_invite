@@ -1,6 +1,6 @@
 <?php
 
-use Yii;
+/* use Yii; */
 
 use humhub\modules\ui\form\widgets\ActiveForm;
 use yii\helpers\Html;

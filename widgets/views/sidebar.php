@@ -5,7 +5,7 @@ use yii\helpers\Html;
 // humhub\modules\social_invite\Assets::register($this);
 use humhub\models\Setting;
 use humhub\modules\user\models\User;
-use Yii;
+/* use Yii; */
 //use yii\helpers\Json;
 
 $social_invite=Yii::$app->getModule('social_invite'); 
