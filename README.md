@@ -36,6 +36,19 @@ git clone https://github.com/petersphilo/humhub-social_invite.git social_invite
 
 - Click "Enable". This will install the module for you
 
+- Note: with HumHub 1.16.x, you need to add the following code to the file `protected/config/web.php`:
+```
+	'modules' => [
+		'web' => [
+			'security' =>  [
+				'csp' => [
+					'nonce' => false
+				]
+			]
+		]
+	]
+```
+
 Eventually, i hope to have this module in the 'store'
 
 ### Installation (Manually, using Release zip - for those not comfortable with the command line)
