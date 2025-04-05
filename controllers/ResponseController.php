@@ -44,14 +44,6 @@ class ResponseController extends \humhub\components\Controller
 		$userEmail=''; 
 		$ActivityLog='';
 		$ResponseTitle=Yii::t('SocialInviteModule.base','Error'); 
-		/*
-		if (Yii::$app->request->get('ThisIsAtest')=='Yes'){
-			$TheGuestEmail='The GET Request worked'; 
-			$ResponseMessage='The test worked'; 
-			return $this->renderAjax('response', ['TheGuestEmail' => $TheGuestEmail,'TheOriginatorID' => $userID,'ResponseMessage' => $ResponseMessage]);
-			return; 
-			}
-		*/
 		
 		if (Yii::$app->request->get('TheGuestEmail')!=''){
 			$TheGuestEmail=trim(urldecode(Yii::$app->request->get('TheGuestEmail'))); 
@@ -73,18 +65,35 @@ class ResponseController extends \humhub\components\Controller
 		// Invalid E-Mail
 		$validator = new EmailValidator;
 		if (!$validator->validate($TheGuestEmail)) {
-			//$ResponseMessage.='The Guest email you provided could not be validated'.$MyBR; 
 			$ResponseMessage.=Yii::t('SocialInviteModule.base','The Guest email you provided could not be validated').$MyBR; 
+			$ResponseTitle=Yii::t('SocialInviteModule.base','No Invitation Sent'); 
 			//return false;
+			$ActivityLog.='No valid email'.$MyBR; 
+			return $this->renderAjax('response', [
+						'TheGuestEmail' => $TheGuestEmail,
+						'TheOriginatorID' => $userID.'; '.$userEmail,
+						'ResponseMessage' => $ResponseMessage,
+						'ResponseTitle' => $ResponseTitle,
+						'ActivityLog' => $ActivityLog
+						]);
+			/* die();  */
 			}
 
 		// User already registered
 		$user = User::findOne(['email' => $TheGuestEmail]);
 		if ($user != null) {
-			//$ResponseMessage.='The Guest email you provided belongs to a member already registered, <b><u>no email was sent</u></b>'.$MyBR; 
 			$ResponseMessage.=Yii::t('SocialInviteModule.base','The Guest email you provided belongs to a member already registered, <b><u>no email was sent</u></b>').$MyBR; 
 			$ResponseTitle=Yii::t('SocialInviteModule.base','No Invitation Sent'); 
 			//return false; 
+			$ActivityLog.='Already member'.$MyBR; 
+			return $this->renderAjax('response', [
+						'TheGuestEmail' => $TheGuestEmail,
+						'TheOriginatorID' => $userID.'; '.$userEmail,
+						'ResponseMessage' => $ResponseMessage,
+						'ResponseTitle' => $ResponseTitle,
+						'ActivityLog' => $ActivityLog
+						]);
+			/* die();  */
 			}
 
 		$NativeInviteCount=0; 
@@ -114,6 +123,7 @@ class ResponseController extends \humhub\components\Controller
 			$userEmail=Yii::$app->db->createCommand("SELECT email FROM user WHERE id=$userID;")->queryScalar(); 
 			if($NativeInviteCount){}; 
 			//social_invite
+			$NewTimesSent=0; 
 			$CheckSocInvitedb_cmd=Yii::$app->db->createCommand("SELECT id as SocInviteID,guest_email,date_updated,originator_ID,times_sent FROM social_invite WHERE guest_email=:Email;"); 
 			$CheckSocInvitedb=$CheckSocInvitedb_cmd->bindValue(':Email',$TheGuestEmail)->queryAll(); 
 			$MyRecordsCount=count($CheckSocInvitedb); 
@@ -124,8 +134,9 @@ class ResponseController extends \humhub\components\Controller
 					$FreshNewInvite=Yii::$app->db->createCommand("INSERT INTO social_invite (guest_email,originator_ID,originator_email,times_sent) VALUES (:Email,'$userID','$userEmail',1);"); 
 					$FreshNewInvite->bindValue(':Email',$TheGuestEmail)->query(); 
 					}
-				elseif($MyRecordsCount==1){
-					$ActivityLog.='Nothing in social_invite, but there was a native Invite'.$MyBR; // incomplete!
+				elseif($MyRecordsCount>=1){
+					$NewTimesSent=$MyRecordsCount+1; 
+					$ActivityLog.='Exists in social_invite, no native Invite'.$MyBR; // incomplete!
 					Yii::$app->db->createCommand("UPDATE social_invite SET times_sent=$NewTimesSent,date_updated=NOW() WHERE social_invite.id = $SocInviteID;")->query(); 
 					}
 				$userInvite->sendInviteMail(); 
