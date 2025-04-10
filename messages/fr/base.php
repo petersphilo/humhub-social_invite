@@ -32,3 +32,4 @@ return array (
 	'No valid email'=>'Aucune adresse mail valide',
 	'Already member'=>'Déjà membre',
 	'xxxxxx'=>'xxxxxx',
+	); 

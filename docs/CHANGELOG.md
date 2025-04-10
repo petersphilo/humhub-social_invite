@@ -1,6 +1,6 @@
 
 
-### 1.1.3
+### 1.1.4
 
 bug fixes - should work with HumHub 1.14.x->1.17.x
 
